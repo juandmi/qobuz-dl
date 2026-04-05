@@ -43,7 +43,6 @@ def _reset_config(config_file, use_token=False):
         config["DEFAULT"]["password"] = hashlib.md5(password.encode("utf-8")).hexdigest()
         config["DEFAULT"]["user_id"] = ""
         config["DEFAULT"]["user_auth_token"] = ""
-    
     config["DEFAULT"]["default_folder"] = (
         input("Folder for downloads (leave empty for default 'Qobuz Downloads')\n- ")
         or "Qobuz Downloads"
@@ -205,7 +204,23 @@ def main():
         qobuz.app_id = app_id
         qobuz.secrets = secrets
         qobuz.private_key = private_key
-        qobuz.handle_oauth_login(arguments.code)
+        result = qobuz.handle_oauth_login(arguments.code)
+
+        if result:
+            # Save token to config so subsequent commands use token auth
+            config = configparser.ConfigParser()
+            config.read(CONFIG_FILE)
+            config["DEFAULT"]["user_id"] = result["user_id"]
+            config["DEFAULT"]["user_auth_token"] = result["user_auth_token"]
+            config["DEFAULT"]["app_id"] = str(app_id)
+            config["DEFAULT"]["secrets"] = ",".join(secrets)
+            config["DEFAULT"]["private_key"] = private_key or ""
+            # Clear email/password so token path is used
+            config["DEFAULT"]["email"] = ""
+            config["DEFAULT"]["password"] = ""
+            with open(CONFIG_FILE, "w") as configfile:
+                config.write(configfile)
+            logging.info(f"{GREEN}Credentials saved to {CONFIG_FILE}")
         return
 
     if user_id and user_auth_token:
