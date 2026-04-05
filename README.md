@@ -42,6 +42,16 @@ qobuz-dl.exe
 
 > If something fails, run `qobuz-dl -r` to reset your config file.
 
+### OAuth Authentication (April 2026+)
+
+Qobuz deprecated direct email/password login. You now need to authenticate via OAuth:
+
+```
+qobuz-dl oauth
+```
+
+This opens a browser for Qobuz login and automatically captures the token. After success, all commands (`dl`, `fun`, `lucky`) work as before. Re-run `qobuz-dl oauth` when the token expires.
+
 ## Examples
 
 ### Download mode
@@ -143,10 +153,11 @@ commands:
   run qobuz-dl <command> --help for more info
   (e.g. qobuz-dl fun --help)
 
-  {fun,dl,lucky}
+  {fun,dl,lucky,oauth}
     fun           interactive mode
     dl            input mode
     lucky         lucky mode
+    oauth         OAuth login (required since Apr 2026)
 ```
 
 ## Module usage 
